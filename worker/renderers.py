@@ -92,17 +92,29 @@ class ComfyRenderer:
         """Fill placeholder tokens in a workflow-API-format JSON.
 
         Placeholders (string values in node inputs) that get replaced:
-        __PROMPT__ __NEGATIVE__ __SEED__ __STEPS__ __CFG__ __SAMPLER__
-        __SCHEDULER__ __WIDTH__ __HEIGHT__ __FRAMES__ __FPS__ __INIT_IMAGE__
-        __UNET__ __VAE__ __CLIP__ __LORA__
+        __PROMPT__ __NEGATIVE__ __SEED__ __STEPS__ __HIGH_STEPS__ __CFG__
+        __SAMPLER__ __SCHEDULER__ __WIDTH__ __HEIGHT__ __FRAMES__ __FPS__
+        __INIT_IMAGE__ __UNET_HIGH__ __UNET_LOW__ __VAE__ __CLIP__
+        __LORA_HIGH__ __LORA_LOW__
+
+        A14B is a 2-expert MoE (high-noise expert handles the first
+        `high_noise_steps` of the schedule, low-noise expert the rest), so each
+        mode needs its own high/low UNet GGUF + its own high/low Lightning LoRA.
         """
         m = task["manifest"]["assets"]
-        lora = m["lora_i2v"] if task["mode"] == "i2v" else m["lora_t2v"]
+        manifest = task["manifest"]
+        if task["mode"] == "i2v":
+            unet_high, unet_low = m["unet_high_i2v"], m["unet_low_i2v"]
+            lora_high, lora_low = m["lora_i2v_high"], m["lora_i2v_low"]
+        else:
+            unet_high, unet_low = m["unet_high"], m["unet_low"]
+            lora_high, lora_low = m["lora_t2v_high"], m["lora_t2v_low"]
         repl = {
             "__PROMPT__": task["prompt"],
             "__NEGATIVE__": task["negative"],
             "__SEED__": task["seed"],
             "__STEPS__": task["steps"],
+            "__HIGH_STEPS__": manifest.get("high_noise_steps", task["steps"] // 2),
             "__CFG__": task["cfg"],
             "__SAMPLER__": task["sampler"],
             "__SCHEDULER__": task["scheduler"],
@@ -111,10 +123,12 @@ class ComfyRenderer:
             "__FRAMES__": task["num_frames"],
             "__FPS__": task["fps"],
             "__INIT_IMAGE__": init_image_name or "",
-            "__UNET__": m["unet_gguf"],
+            "__UNET_HIGH__": unet_high,
+            "__UNET_LOW__": unet_low,
             "__VAE__": m["vae"],
             "__CLIP__": m["text_encoder"],
-            "__LORA__": lora,
+            "__LORA_HIGH__": lora_high,
+            "__LORA_LOW__": lora_low,
         }
         raw = json.dumps(wf)
         for k, v in repl.items():

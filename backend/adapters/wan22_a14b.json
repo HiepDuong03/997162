@@ -1,6 +1,6 @@
 {
   "model_id": "wan22_a14b",
-  "display_name": "Wan 2.2 A14B (Lightning 4-step)",
+  "display_name": "Wan 2.2 A14B (Lightning 4-step, dual-expert MoE)",
   "supports_t2v": true,
   "supports_i2v": true,
   "supports_negative_prompt": true,
@@ -8,6 +8,7 @@
   "needs_cfg": false,
   "cfg": 1.0,
   "steps": 4,
+  "high_noise_steps": 2,
   "sampler": "euler",
   "scheduler": "simple",
   "max_frames": 81,
@@ -20,11 +21,17 @@
   "fallback_model": null,
   "workflow_t2v": "wan22_t2v_lightning.json",
   "workflow_i2v": "wan22_i2v_lightning.json",
+  "_comment": "A14B is a 2-expert MoE: high-noise expert runs the first `high_noise_steps`, low-noise expert runs the rest. Each expert needs its own UNet GGUF + its own Lightning LoRA.",
   "assets": {
-    "unet_gguf": "wan2.2-a14b-Q5_K_M.gguf",
-    "text_encoder": "umt5-xxl-encoder-fp8_e4m3fn.safetensors",
+    "unet_high": "wan2.2-t2v-a14b-highnoise-Q5_K_M.gguf",
+    "unet_low": "wan2.2-t2v-a14b-lownoise-Q5_K_M.gguf",
+    "unet_high_i2v": "wan2.2-i2v-a14b-highnoise-Q5_K_M.gguf",
+    "unet_low_i2v": "wan2.2-i2v-a14b-lownoise-Q5_K_M.gguf",
+    "text_encoder": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
     "vae": "wan2.2_vae.safetensors",
-    "lora_t2v": "wan2.2-lightning-t2v-a14b-4steps.safetensors",
-    "lora_i2v": "wan2.2-lightning-i2v-a14b-4steps.safetensors"
+    "lora_t2v_high": "wan2.2-lightning-t2v-a14b-4steps-highnoise.safetensors",
+    "lora_t2v_low": "wan2.2-lightning-t2v-a14b-4steps-lownoise.safetensors",
+    "lora_i2v_high": "wan2.2-lightning-i2v-a14b-4steps-highnoise.safetensors",
+    "lora_i2v_low": "wan2.2-lightning-i2v-a14b-4steps-lownoise.safetensors"
   }
 }

@@ -1,7 +1,11 @@
 {
   "10": {
     "class_type": "UnetLoaderGGUF",
-    "inputs": { "unet_name": "__UNET__" }
+    "inputs": { "unet_name": "__UNET_HIGH__" }
+  },
+  "10b": {
+    "class_type": "UnetLoaderGGUF",
+    "inputs": { "unet_name": "__UNET_LOW__" }
   },
   "11": {
     "class_type": "CLIPLoader",
@@ -13,7 +17,11 @@
   },
   "13": {
     "class_type": "LoraLoaderModelOnly",
-    "inputs": { "model": ["10", 0], "lora_name": "__LORA__", "strength_model": 1.0 }
+    "inputs": { "model": ["10", 0], "lora_name": "__LORA_HIGH__", "strength_model": 1.0 }
+  },
+  "13b": {
+    "class_type": "LoraLoaderModelOnly",
+    "inputs": { "model": ["10b", 0], "lora_name": "__LORA_LOW__", "strength_model": 1.0 }
   },
   "14": {
     "class_type": "LoadImage",
@@ -41,23 +49,46 @@
     }
   },
   "40": {
-    "class_type": "KSampler",
+    "_comment": "High-noise expert",
+    "class_type": "KSamplerAdvanced",
     "inputs": {
       "model": ["13", 0],
       "positive": ["31", 0],
       "negative": ["31", 1],
       "latent_image": ["31", 2],
-      "seed": "__SEED__",
+      "noise_seed": "__SEED__",
       "steps": "__STEPS__",
       "cfg": "__CFG__",
       "sampler_name": "__SAMPLER__",
       "scheduler": "__SCHEDULER__",
-      "denoise": 1.0
+      "start_at_step": 0,
+      "end_at_step": "__HIGH_STEPS__",
+      "add_noise": "enable",
+      "return_with_leftover_noise": "enable"
+    }
+  },
+  "41": {
+    "_comment": "Low-noise expert",
+    "class_type": "KSamplerAdvanced",
+    "inputs": {
+      "model": ["13b", 0],
+      "positive": ["31", 0],
+      "negative": ["31", 1],
+      "latent_image": ["40", 0],
+      "noise_seed": "__SEED__",
+      "steps": "__STEPS__",
+      "cfg": "__CFG__",
+      "sampler_name": "__SAMPLER__",
+      "scheduler": "__SCHEDULER__",
+      "start_at_step": "__HIGH_STEPS__",
+      "end_at_step": 10000,
+      "add_noise": "disable",
+      "return_with_leftover_noise": "disable"
     }
   },
   "50": {
     "class_type": "VAEDecode",
-    "inputs": { "samples": ["40", 0], "vae": ["12", 0] }
+    "inputs": { "samples": ["41", 0], "vae": ["12", 0] }
   },
   "60": {
     "class_type": "VHS_VideoCombine",
