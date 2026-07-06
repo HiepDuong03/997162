@@ -1,0 +1,30 @@
+{
+  "model_id": "wan22_a14b",
+  "display_name": "Wan 2.2 A14B (Lightning 4-step)",
+  "supports_t2v": true,
+  "supports_i2v": true,
+  "supports_negative_prompt": true,
+  "supports_lora": true,
+  "needs_cfg": false,
+  "cfg": 1.0,
+  "steps": 4,
+  "sampler": "euler",
+  "scheduler": "simple",
+  "max_frames": 81,
+  "fps": 16,
+  "resolutions": {
+    "480p": { "width": 832, "height": 480, "min_vram_gb": 12 },
+    "720p": { "width": 1280, "height": 720, "min_vram_gb": 24 }
+  },
+  "default_resolution": "480p",
+  "fallback_model": null,
+  "workflow_t2v": "wan22_t2v_lightning.json",
+  "workflow_i2v": "wan22_i2v_lightning.json",
+  "assets": {
+    "unet_gguf": "wan2.2-a14b-Q5_K_M.gguf",
+    "text_encoder": "umt5-xxl-encoder-fp8_e4m3fn.safetensors",
+    "vae": "wan2.2_vae.safetensors",
+    "lora_t2v": "wan2.2-lightning-t2v-a14b-4steps.safetensors",
+    "lora_i2v": "wan2.2-lightning-i2v-a14b-4steps.safetensors"
+  }
+}

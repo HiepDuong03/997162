@@ -1,0 +1,70 @@
+{
+  "10": {
+    "class_type": "UnetLoaderGGUF",
+    "inputs": { "unet_name": "__UNET__" }
+  },
+  "11": {
+    "class_type": "CLIPLoader",
+    "inputs": { "clip_name": "__CLIP__", "type": "wan", "device": "default" }
+  },
+  "12": {
+    "class_type": "VAELoader",
+    "inputs": { "vae_name": "__VAE__" }
+  },
+  "13": {
+    "class_type": "LoraLoaderModelOnly",
+    "inputs": { "model": ["10", 0], "lora_name": "__LORA__", "strength_model": 1.0 }
+  },
+  "20": {
+    "class_type": "CLIPTextEncode",
+    "inputs": { "clip": ["11", 0], "text": "__PROMPT__" }
+  },
+  "21": {
+    "class_type": "CLIPTextEncode",
+    "inputs": { "clip": ["11", 0], "text": "__NEGATIVE__" }
+  },
+  "30": {
+    "class_type": "EmptyHunyuanLatentVideo",
+    "inputs": { "width": "__WIDTH__", "height": "__HEIGHT__", "length": "__FRAMES__", "batch_size": 1 }
+  },
+  "40": {
+    "class_type": "KSampler",
+    "inputs": {
+      "model": ["13", 0],
+      "positive": ["20", 0],
+      "negative": ["21", 0],
+      "latent_image": ["30", 0],
+      "seed": "__SEED__",
+      "steps": "__STEPS__",
+      "cfg": "__CFG__",
+      "sampler_name": "__SAMPLER__",
+      "scheduler": "__SCHEDULER__",
+      "denoise": 1.0
+    }
+  },
+  "50": {
+    "class_type": "VAEDecode",
+    "inputs": { "samples": ["40", 0], "vae": ["12", 0] }
+  },
+  "60": {
+    "class_type": "VHS_VideoCombine",
+    "inputs": {
+      "images": ["50", 0],
+      "frame_rate": "__FPS__",
+      "loop_count": 0,
+      "filename_prefix": "openflow",
+      "format": "video/h264-mp4",
+      "pix_fmt": "yuv420p",
+      "crf": 19,
+      "save_output": true
+    }
+  },
+  "70": {
+    "class_type": "ImageSelect",
+    "inputs": { "images": ["50", 0], "index": -1 }
+  },
+  "71": {
+    "class_type": "SaveImage",
+    "inputs": { "images": ["70", 0], "filename_prefix": "last_frame" }
+  }
+}

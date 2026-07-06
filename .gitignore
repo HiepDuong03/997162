@@ -1,0 +1,29 @@
+# Python
+backend/.venv/
+backend/__pycache__/
+**/__pycache__/
+*.pyc
+backend/openflow.db
+backend/openflow.db-*
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# Runtime assets (refs/clips/exports are generated at runtime, not checked in)
+assets/refs/*
+assets/clips/*
+assets/exports/*
+assets/frames/*
+!assets/refs/.gitkeep
+!assets/clips/.gitkeep
+!assets/exports/.gitkeep
+!assets/frames/.gitkeep
+
+# Model weights (huge — go in Kaggle Dataset, not git)
+*.gguf
+*.safetensors
+
+# OS
+.DS_Store
+Thumbs.db
